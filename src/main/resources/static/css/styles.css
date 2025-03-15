@@ -1,0 +1,261 @@
+/* Main Colors */
+:root {
+    --main-color: #0e76a8;
+    --secondary-color: #f0f0f0;
+    --accent-color: #ff5722;
+    --text-color: #333;
+    --light-text: #f8f9fa;
+    --border-color: #dee2e6;
+    --gradient-start: #0e76a8;
+    --gradient-end: #1a9be1;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --hover-transition: all 0.3s ease;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    color: var(--text-color);
+    background-color: #f8f9fa;
+    line-height: 1.6;
+}
+
+/* Navbar Styling */
+.main-color {
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+}
+
+.navbar {
+    box-shadow: var(--box-shadow);
+    padding: 0.8rem 1rem;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.nav-link {
+    position: relative;
+    transition: var(--hover-transition);
+}
+
+.nav-link:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--light-text);
+    transition: width 0.3s;
+}
+
+.nav-link:hover:after {
+    width: 100%;
+}
+
+/* Monica Reading Highlight */
+.monica-reading-highlight {
+    animation: fadeInOut 1.5s ease-in-out;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { background-color: transparent; }
+    30%, 70% { background-color: rgba(2, 118, 255, 0.20); }
+}
+
+/* Hero Section Images */
+.col-image-left {
+    background-image: url("../images/reading.jpg");
+    height: 25em !important;
+    background-size: cover;
+    background-position: center;
+}
+
+.col-image-right {
+    background-image: url("../images/library-interior.jpg");
+    height: 25em !important;
+    background-size: cover;
+    background-position: center;
+}
+
+.lost-image {
+    background-image: url("../images/lost-book.jpg");
+    height: 25em !important;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Card Styling */
+.card {
+    box-shadow: var(--box-shadow);
+    transition: var(--hover-transition);
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    font-weight: bold;
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+    color: white;
+    padding: 1rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Button Styling */
+.btn {
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: var(--hover-transition);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-outline-secondary {
+    border-color: var(--main-color);
+    color: var(--main-color);
+}
+
+.btn-outline-secondary:hover {
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    color: white;
+    border-color: transparent;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--gradient-end), var(--gradient-start));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(14, 118, 168, 0.3);
+}
+
+/* Footer Styling */
+.footer {
+    padding: 2rem 0;
+    margin-top: 3rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.footer h5 {
+    color: var(--main-color);
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.footer a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: var(--main-color);
+    text-decoration: underline;
+}
+
+/* Homepage Carousel */
+.homepage-carousel-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.homepage-carousel-title h3 {
+    color: var(--main-color);
+    font-weight: bold;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.homepage-carousel-title h3:after {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.carousel-item {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Section Styling */
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-header h2 {
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 12px;
+}
+
+.section-header h2:after {
+    content: '';
+    position: absolute;
+    width: 70px;
+    height: 3px;
+    background: var(--accent-color);
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Book Display */
+.book-div {
+    width: 480px;
+    height: 384px;
+}
+
+/* Pagination */
+.pagination .page-item.active .page-link {
+    background-color: var(--main-color);
+    border-color: var(--main-color);
+}
+
+.pagination .page-link {
+    color: var(--main-color);
+}
+
+.pagination .page-link:hover {
+    color: white;
+    background-color: var(--main-color);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .col-image-left, .col-image-right, .lost-image {
+        height: 15em !important;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .section-header {
+        margin-bottom: 2rem;
+    }
+} 

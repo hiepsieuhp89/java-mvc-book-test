@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="layout/main :: head('Thông tin sách')">
+    <!-- Nội dung này sẽ bị thay thế bởi fragment head -->
+</head>
+
+<body>
+    <div th:replace="layout/main :: body(content=~{::div.content})">
+        <div class="content">
+            <div class="container">
+                <div class="row mt-5 justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header main-color text-white">
+                                <h4 class="card-title mb-0">Thông tin sách</h4>
+                            </div>
+                            <div class="card-body">
+                                <!-- Nội dung chi tiết sách sẽ được hiển thị ở đây -->
+                                <div th:if="${book}" class="book-details">
+                                    <div class="text-center mb-4">
+                                        <img th:if="${book.image}" th:src="${book.image}" width="200" alt="book cover" />
+                                    </div>
+                                    <h3 th:text="${book.title}">Tên sách</h3>
+                                    <p><strong>Tác giả:</strong> <span th:text="${book.author}">Tác giả</span></p>
+                                    <p><strong>Mô tả:</strong> <span th:text="${book.description}">Mô tả sách</span></p>
+                                    <!-- Thêm các thông tin khác của sách nếu cần -->
+                                </div>
+                                
+                                <!-- Thông báo nếu không tìm thấy sách -->
+                                <div th:unless="${book}" class="alert alert-warning">
+                                    Không tìm thấy thông tin sách.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

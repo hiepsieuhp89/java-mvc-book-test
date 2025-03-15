@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="layout/main :: head('Thông tin cá nhân')">
+    <!-- Nội dung này sẽ bị thay thế bởi fragment head -->
+</head>
+
+<body>
+    <div th:replace="layout/main :: body(content=~{::div.content})">
+        <div class="content">
+            <div class="container">
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h2 class="mb-4">Thông tin cá nhân</h2>
+                        
+                        <div class="row">
+                            <!-- Profile Information -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header main-color text-white">
+                                        <h5 class="mb-0">Thông tin tài khoản</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div th:if="${param.success}" class="alert alert-success">
+                                            Cập nhật thông tin thành công!
+                                        </div>
+                                        <form th:action="@{/profile}" method="post" th:object="${userProfile}">
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="email" th:field="*{email}" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">Tên đăng nhập</label>
+                                                <input type="text" class="form-control" id="username" th:field="*{username}" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="firstName" class="form-label">Họ</label>
+                                                <input type="text" class="form-control" id="firstName" th:field="*{firstName}">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="lastName" class="form-label">Tên</label>
+                                                <input type="text" class="form-control" id="lastName" th:field="*{lastName}">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="phone" class="form-label">Số điện thoại</label>
+                                                <input type="text" class="form-control" id="phone" th:field="*{phone}">
+                                            </div>
+                                            <button type="submit" class="btn main-color text-white">Cập nhật thông tin</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Change Password -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header main-color text-white">
+                                        <h5 class="mb-0">Đổi mật khẩu</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div th:if="${param.passwordSuccess}" class="alert alert-success">
+                                            Đổi mật khẩu thành công!
+                                        </div>
+                                        <div th:if="${param.passwordError}" class="alert alert-danger">
+                                            Mật khẩu hiện tại không đúng!
+                                        </div>
+                                        <form th:action="@{/profile/password}" method="post">
+                                            <div class="mb-3">
+                                                <label for="currentPassword" class="form-label">Mật khẩu hiện tại</label>
+                                                <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="newPassword" class="form-label">Mật khẩu mới</label>
+                                                <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="confirmPassword" class="form-label">Xác nhận mật khẩu mới</label>
+                                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                            </div>
+                                            <button type="submit" class="btn main-color text-white">Đổi mật khẩu</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

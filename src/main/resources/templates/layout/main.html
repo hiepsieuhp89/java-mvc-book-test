@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' - Thư Viện Sách Điện Tử'">Thư Viện Sách Điện Tử</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" 
+          rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" 
+          crossorigin="anonymous">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    
+    <style>
+        /* Main Colors */
+        :root {
+            --main-color: #0e76a8;
+        }
+        
+        .main-color {
+            background-color: var(--main-color) !important;
+        }
+        
+        /* Hero section images */
+        .col-image-left {
+            background-image: url('/images/public-images/image-1.jpg');
+            height: 25em;
+            background-size: cover;
+        }
+        
+        .col-image-right {
+            background-image: url('/images/public-images/image-2.jpg');
+            height: 25em;
+            background-size: cover;
+        }
+        
+        .lost-image {
+            background-image: url('/images/public-images/image-3.jpg');
+            height: 25em;
+            background-size: cover;
+        }
+        
+        .homepage-carousel-title {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" 
+          integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    
+    <style>
+        /* Main Colors */
+        :root {
+            --main-color: #0e76a8;
+        }
+        
+        .main-color {
+            background-color: var(--main-color);
+        }
+        
+        /* Hero section images */
+        .col-image-left {
+            background-image: url('/images/public-images/image-1.jpg');
+            height: 25em;
+            background-size: cover;
+        }
+        
+        .col-image-right {
+            background-image: url('/images/public-images/image-2.jpg');
+            height: 25em;
+            background-size: cover;
+        }
+        
+        .lost-image {
+            background-image: url('/images/public-images/image-3.jpg');
+            height: 25em;
+            background-size: cover;
+        }
+        
+        .homepage-carousel-title {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .book-div {
+            width: 480px;
+            height: 384px;
+        }
+        
+        .inactiveLink {
+            pointer-events: none;
+            cursor: default;
+        }
+    </style>
+    
+    <!-- Thêm các script hoặc style khác nếu cần -->
+    <th:block th:replace="${extraHeadContent} ?: ~{}"></th:block>
+</head>
+<body th:fragment="body(content)">
+    <div th:fragment="body(content)">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark main-color py-3">
+            <div class="container-fluid">
+                <span class="navbar-brand text-info"><b>Thư Viện Sách Điện Tử</b></span>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" 
+                        aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle Navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/home">Trang chủ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Giới thiệu</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/search">Sách điện tử</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/contact">Liên hệ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/invite">Mời bạn bè</a>
+                        </li>
+                        <li class="nav-item" sec:authorize="isAuthenticated()">
+                            <a class="nav-link" href="/shelf">Đơn hàng của tôi</a>
+                        </li>
+                        <li class="nav-item" sec:authorize="isAuthenticated()">
+                            <a class="nav-link" href="/messages">Tin nhắn</a>
+                        </li>
+                        <li class="nav-item" sec:authorize="isAuthenticated()">
+                            <a class="nav-link" href="/fees">Phí</a>
+                        </li>
+                        <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN')">
+                            <a class="nav-link" href="/admin">Quản trị</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item" sec:authorize="!isAuthenticated()">
+                            <a class="nav-link" href="/login">Đăng nhập</a>
+                        </li>
+                        <li class="nav-item" sec:authorize="!isAuthenticated()">
+                            <a class="nav-link" href="/register">Đăng ký</a>
+                        </li>
+                        <li class="nav-item" sec:authorize="isAuthenticated()">
+                            <span class="nav-link text-white">
+                                Xin chào, <span sec:authentication="name">User</span>
+                            </span>
+                        </li>
+                        <li class="nav-item" sec:authorize="isAuthenticated()">
+                            <a class="nav-link" href="/logout">Đăng xuất</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Content -->
+        <div th:replace="${content}">
+            <!-- Content will be replaced -->
+        </div>
+        
+        <!-- Footer -->
+        <div class="container">
+            <footer class="py-5 mt-5">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5>Thư Viện Sách Điện Tử</h5>
+                        <p class="text-muted">
+                            Nơi kết nối tri thức và đam mê đọc sách
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Liên kết</h5>
+                        <ul class="nav flex-column">
+                            <li class="nav-item mb-2"><a href="/home" class="nav-link p-0 text-muted">Trang chủ</a></li>
+                            <li class="nav-item mb-2"><a href="/search" class="nav-link p-0 text-muted">Sách điện tử</a></li>
+                            <li class="nav-item mb-2"><a href="/contact" class="nav-link p-0 text-muted">Liên hệ</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Liên hệ</h5>
+                        <ul class="nav flex-column">
+                            <li class="nav-item mb-2 text-muted">
+                                <i class="fas fa-map-marker-alt me-2"></i> 123 Đường ABC, Quận XYZ, TP.HCM
+                            </li>
+                            <li class="nav-item mb-2 text-muted">
+                                <i class="fas fa-phone me-2"></i> (028) 1234 5678
+                            </li>
+                            <li class="nav-item mb-2 text-muted">
+                                <i class="fas fa-envelope me-2"></i> info@thuviensachdientu.com
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between py-4 my-4 border-top">
+                    <p>&copy; 2023 Thư Viện Sách Điện Tử. Đã đăng ký bản quyền.</p>
+                    <ul class="list-unstyled d-flex">
+                        <li class="ms-3"><a class="link-dark" href="#"><i class="fab fa-facebook fa-lg"></i></a></li>
+                        <li class="ms-3"><a class="link-dark" href="#"><i class="fab fa-twitter fa-lg"></i></a></li>
+                        <li class="ms-3"><a class="link-dark" href="#"><i class="fab fa-instagram fa-lg"></i></a></li>
+                    </ul>
+                </div>
+            </footer>
+        </div>
+        
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" 
+                integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" 
+                crossorigin="anonymous"></script>
+    </div>
+</body>
+</html> 

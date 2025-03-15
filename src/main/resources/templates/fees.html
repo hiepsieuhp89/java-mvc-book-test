@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="layout/main :: head('Phí thanh toán')">
+    <!-- Nội dung này sẽ bị thay thế bởi fragment head -->
+</head>
+
+<body>
+    <div th:replace="layout/main :: body(content=~{::div.content})">
+        <div class="content">
+            <div class="container">
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h2 class="mb-4">Phí thanh toán</h2>
+                        
+                        <div class="card mt-4">
+                            <div class="card-header main-color text-white">
+                                <h5 class="mb-0">Phí chưa thanh toán</h5>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${#lists.isEmpty(fees)}" class="text-center">
+                                    <p>Bạn không có khoản phí nào cần thanh toán.</p>
+                                </div>
+                                <div th:unless="${#lists.isEmpty(fees)}" class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Sách</th>
+                                                <th>Loại phí</th>
+                                                <th>Ngày tạo</th>
+                                                <th>Số tiền</th>
+                                                <th>Trạng thái</th>
+                                                <th>Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="fee : ${fees}">
+                                                <td th:text="${fee.amount} + ' VNĐ'">Amount</td>
+                                                <td th:text="${fee.paid ? 'Đã thanh toán' : 'Chưa thanh toán'}">Status</td>
+                                                <td>
+                                                    <a th:if="${!fee.paid}" th:href="@{/pay/{id}(id=${fee.id})}" 
+                                                       class="btn btn-sm btn-success">Thanh toán</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4">
+                            <div class="card-header main-color text-white">
+                                <h5 class="mb-0">Lịch sử thanh toán</h5>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${#lists.isEmpty(paymentHistory)}" class="text-center">
+                                    <p>Bạn chưa có lịch sử thanh toán.</p>
+                                </div>
+                                <div th:unless="${#lists.isEmpty(paymentHistory)}" class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Sách</th>
+                                                <th>Ngày thanh toán</th>
+                                                <th>Số tiền</th>
+                                                <th>Phương thức</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="payment : ${paymentHistory}">
+                                                <td>
+                                                    <a th:href="@{/book/{id}(id=${payment.book.id})}" 
+                                                       th:text="${payment.book.title}">Book Title</a>
+                                                </td>
+                                                <td th:text="${#dates.format(payment.paymentDate, 'dd/MM/yyyy')}">Payment Date</td>
+                                                <td th:text="${payment.amount} + ' VNĐ'">Amount</td>
+                                                <td th:text="${payment.method}">Method</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="layout/main :: head('Quản trị')">
+    <!-- Nội dung này sẽ bị thay thế bởi fragment head -->
+</head>
+
+<body>
+    <div th:replace="layout/main :: body(content=~{::div.content})">
+        <div class="content">
+            <div class="container">
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h2 class="mb-4">Quản lý hệ thống</h2>
+                        
+                        <!-- Admin Tabs -->
+                        <ul class="nav nav-tabs" id="adminTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="books-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#books" type="button" role="tab" 
+                                        aria-controls="books" aria-selected="true">
+                                    Quản lý sách
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="users-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#users" type="button" role="tab" 
+                                        aria-controls="users" aria-selected="false">
+                                    Quản lý người dùng
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="messages-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#messages" type="button" role="tab" 
+                                        aria-controls="messages" aria-selected="false">
+                                    Quản lý tin nhắn
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="loans-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#loans" type="button" role="tab" 
+                                        aria-controls="loans" aria-selected="false">
+                                    Quản lý mượn sách
+                                </button>
+                            </li>
+                        </ul>
+                        
+                        <!-- Tab Content -->
+                        <div class="tab-content" id="adminTabContent">
+                            <!-- Books Tab -->
+                            <div class="tab-pane fade show active" id="books" role="tabpanel" aria-labelledby="books-tab">
+                                <div class="card mt-3">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Danh sách sách</h5>
+                                        <a th:href="@{/admin/books/add}" class="btn btn-sm btn-success">Thêm sách mới</a>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Tiêu đề</th>
+                                                        <th>Tác giả</th>
+                                                        <th>Thể loại</th>
+                                                        <th>Số lượng</th>
+                                                        <th>Có sẵn</th>
+                                                        <th>Thao tác</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr th:each="book : ${books}">
+                                                        <td th:text="${book.id}">ID</td>
+                                                        <td th:text="${book.title}">Title</td>
+                                                        <td th:text="${book.author}">Author</td>
+                                                        <td th:text="${book.category}">Category</td>
+                                                        <td th:text="${book.copies}">Copies</td>
+                                                        <td th:text="${book.copiesAvailable}">Available</td>
+                                                        <td>
+                                                            <a th:href="@{/admin/books/edit/{id}(id=${book.id})}" 
+                                                               class="btn btn-sm btn-primary">Sửa</a>
+                                                            <a th:href="@{/admin/books/delete/{id}(id=${book.id})}" 
+                                                               class="btn btn-sm btn-danger"
+                                                               onclick="return confirm('Bạn có chắc chắn muốn xóa sách này?')">Xóa</a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Users Tab -->
+                            <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
+                                <div class="card mt-3">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Danh sách người dùng</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Tên đăng nhập</th>
+                                                        <th>Email</th>
+                                                        <th>Họ tên</th>
+                                                        <th>Vai trò</th>
+                                                        <th>Trạng thái</th>
+                                                        <th>Thao tác</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr th:each="user : ${users}">
+                                                        <td th:text="${user.id}">ID</td>
+                                                        <td th:text="${user.username}">Username</td>
+                                                        <td th:text="${user.email}">Email</td>
+                                                        <td th:text="${user.firstName + ' ' + user.lastName}">Full Name</td>
+                                                        <td th:text="${user.role}">Role</td>
+                                                        <td th:text="${user.active ? 'Hoạt động' : 'Bị khóa'}">Status</td>
+                                                        <td>
+                                                            <a th:href="@{/admin/users/edit/{id}(id=${user.id})}" 
+                                                               class="btn btn-sm btn-primary">Sửa</a>
+                                                            <a th:if="${user.active}" 
+                                                               th:href="@{/admin/users/deactivate/{id}(id=${user.id})}" 
+                                                               class="btn btn-sm btn-warning">Khóa</a>
+                                                            <a th:unless="${user.active}" 
+                                                               th:href="@{/admin/users/activate/{id}(id=${user.id})}" 
+                                                               class="btn btn-sm btn-success">Mở khóa</a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Messages Tab -->
+                            <div class="tab-pane fade" id="messages" role="tabpanel" aria-labelledby="messages-tab">
+                                <div class="card mt-3">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Danh sách tin nhắn</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Tiêu đề</th>
+                                                        <th>Ngày gửi</th>
+                                                        <th>Trạng thái</th>
+                                                        <th>Thao tác</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr th:each="msg : ${adminMessages}">
+                                                        <td th:text="${msg.title}">Title</td>
+                                                        <td th:text="${#dates.format(msg.date, 'dd/MM/yyyy HH:mm')}">Date</td>
+                                                        <td th:text="${msg.response != null ? 'Đã trả lời' : 'Chưa trả lời'}">Status</td>
+                                                        <td>
+                                                            <a th:href="@{/admin/messages/view/{id}(id=${msg.id})}" 
+                                                               class="btn btn-sm btn-info">Xem</a>
+                                                            <a th:if="${msg.response == null}" 
+                                                               th:href="@{/admin/messages/reply/{id}(id=${msg.id})}" 
+                                                               class="btn btn-sm btn-primary">Trả lời</a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Loans Tab -->
+                            <div class="tab-pane fade" id="loans" role="tabpanel" aria-labelledby="loans-tab">
+                                <div class="card mt-3">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Danh sách mượn sách</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <tbody>
+                                                    <tr th:each="loan : ${loans}">
+                                                        <td th:text="${loan.book.title}">Book</td>
+                                                        <td th:text="${#dates.format(loan.checkoutDate, 'dd/MM/yyyy')}">Checkout Date</td>
+                                                        <td th:text="${#dates.format(loan.returnDate, 'dd/MM/yyyy')}">Return Date</td>
+                                                        <td th:text="${loan.returned ? 'Đã trả' : 'Đang mượn'}">Status</td>
+                                                        <td>
+                                                            <a th:if="${!loan.returned}" 
+                                                               th:href="@{/admin/loans/return/{id}(id=${loan.id})}" 
+                                                               class="btn btn-sm btn-success">Đánh dấu đã trả</a>
+                                                            <a th:if="${!loan.returned}" 
+                                                               th:href="@{/admin/loans/extend/{id}(id=${loan.id})}" 
+                                                               class="btn btn-sm btn-primary">Gia hạn</a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

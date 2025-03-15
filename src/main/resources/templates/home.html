@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="layout/main :: head('Trang chủ')">
+    <!-- Nội dung này sẽ bị thay thế bởi fragment head -->
+</head>
+
+<body>
+    <div th:replace="layout/main :: body(content=~{::div.content})">
+        <div class="content">
+            <!-- Hero Section -->
+            <div class="d-none d-lg-block">
+                <div class="row g-0 mt-5">
+                    <div class="col-sm-6 col-md-6">
+                        <div class="col-image-left"></div>
+                    </div>
+                    <div class="col-4 col-md-4 container d-flex justify-content-center align-items-center">
+                        <div class="ml-2">
+                            <h1>Bạn đang tìm kiếm cuốn sách nào?</h1>
+                            <p class="lead">
+                                Đội ngũ của chúng tôi sẽ giúp bạn tìm cuốn sách tiếp theo để đọc
+                            </p>
+                            <a class="btn main-color btn-lg text-white" th:href="@{/search}">Khám phá sách</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-0">
+                    <div class="col-4 col-md-4 container d-flex 
+                            justify-content-center align-items-center">
+                        <div class="ml-2">
+                            <h1>Quá trình của chúng tôi</h1>
+                            <p class="lead">
+                                Chúng tôi sẽ làm việc với bạn để tìm ra những cuốn sách hoàn hảo cho bạn.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6">
+                        <div class="col-image-right"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Hero Section -->
+            <div class="d-lg-none">
+                <div class="container">
+                    <div class="m-2">
+                        <div class="col-image-left"></div>
+                        <div class="mt-2">
+                            <h1>Bạn đang tìm kiếm cuốn sách nào?</h1>
+                            <p class="lead">
+                                Đội ngũ của chúng tôi sẽ giúp bạn tìm cuốn sách tiếp theo để đọc
+                            </p>
+                            <a class="btn main-color btn-lg text-white" th:href="@{/search}">Khám phá sách</a>
+                        </div>
+                    </div>
+                    <div class="m-2">
+                        <div class="col-image-right"></div>
+                        <div class="mt-2">
+                            <h1>Quá trình của chúng tôi</h1>
+                            <p class="lead">
+                                Chúng tôi sẽ làm việc với bạn để tìm ra những cuốn sách hoàn hảo cho bạn.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Books Section -->
+            <div class="container mt-5" style="height: 550px;">
+                <div class="homepage-carousel-title">
+                    <h3>Tìm cuốn sách hoàn hảo của bạn</h3>
+                </div>
+                <div id="carouselExampleControls" class="carousel carousel-dark slide mt-5 
+                        d-none d-lg-block" data-bs-interval="false">
+                    <!-- Desktop -->
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <div class="row d-flex justify-content-center align-items-center">
+                                <div th:each="book, iterStat : ${books}" th:if="${iterStat.index < 3}"
+                                    class="col-xs-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                    <div class="text-center">
+                                        <img th:src="${book.image}" width="151" height="233" alt="book" />
+                                        <h6 class="mt-2" th:text="${book.title}">Book Title</h6>
+                                        <p th:text="${book.author}">Author</p>
+                                        <a class="btn main-color text-white" th:href="@{/book/{id}(id=${book.id})}">Chi
+                                            tiết</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="row d-flex justify-content-center align-items-center">
+                                <div th:each="book, iterStat : ${books}"
+                                    th:if="${iterStat.index >= 3 && iterStat.index < 6}"
+                                    class="col-xs-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                    <div class="text-center">
+                                        <img th:src="${book.image}" width="151" height="233" alt="book" />
+                                        <h6 class="mt-2" th:text="${book.title}">Book Title</h6>
+                                        <p th:text="${book.author}">Author</p>
+                                        <a class="btn main-color text-white" th:href="@{/book/{id}(id=${book.id})}">Chi
+                                            tiết</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="row d-flex justify-content-center align-items-center">
+                                <div th:each="book, iterStat : ${books}" th:if="${iterStat.index >= 6}"
+                                    class="col-xs-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                    <div class="text-center">
+                                        <img th:src="${book.image}" width="151" height="233" alt="book" />
+                                        <h6 class="mt-2" th:text="${book.title}">Book Title</h6>
+                                        <p th:text="${book.author}">Author</p>
+                                        <a class="btn main-color text-white" th:href="@{/book/{id}(id=${book.id})}">Chi
+                                            tiết</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls"
+                        data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls"
+                        data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+
+                <!-- Mobile -->
+                <div class="d-lg-none mt-3">
+                    <div class="row d-flex justify-content-center align-items-center">
+                        <div th:each="book, iterStat : ${books}" th:if="${iterStat.index < 4}"
+                            class="col-xs-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                            <div class="text-center">
+                                <img th:src="${book.image}" width="151" height="233" alt="book" />
+                                <h6 class="mt-2" th:text="${book.title}">Book Title</h6>
+                                <p th:text="${book.author}">Author</p>
+                                <a class="btn main-color text-white" th:href="@{/book/{id}(id=${book.id})}">Chi tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="homepage-carousel-title mt-3">
+                    <a class="btn btn-outline-secondary btn-lg" th:href="@{/search}">Xem thêm</a>
+                </div>
+            </div>
+
+            <!-- Services -->
+            <div class="container my-5">
+                <div class="row p-4 align-items-center border shadow-lg">
+                    <div class="col-lg-7 p-3">
+                        <h1 class="display-4 fw-bold">Bạn không thể tìm thấy những gì bạn đang tìm kiếm?</h1>
+                        <p class="lead">
+                            Nếu bạn không thể tìm thấy những gì bạn đang tìm kiếm,
+                            hãy gửi tin nhắn cho chúng tôi!
+                        </p>
+                        <div class="d-grid gap-2 justify-content-md-start mb-4 mb-lg-3">
+                            <a th:href="@{/messages}" class="btn main-color btn-lg text-white">Liên hệ</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 offset-lg-1 shadow-lg lost-image"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
