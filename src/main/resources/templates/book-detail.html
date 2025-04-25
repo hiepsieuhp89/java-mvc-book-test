@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="layout/main :: head('Thông tin sách')">
     <!-- Nội dung này sẽ bị thay thế bởi fragment head -->
@@ -8,29 +8,349 @@
 <body>
     <div th:replace="layout/main :: body(content=~{::div.content})">
         <div class="content">
-            <div class="container">
-                <div class="row mt-5 justify-content-center">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header main-color text-white">
-                                <h4 class="card-title mb-0">Thông tin sách</h4>
+            <div class="container my-5">
+                <div class="row">
+                    <!-- Hình ảnh sách -->
+                    <div class="col-md-4 mb-4">
+                        <div class="book-image-container shadow" style="border-radius: 12px; overflow: hidden;">
+                            <img th:if="${book.image}" th:src="${book.image}" class="img-fluid w-100" alt="book cover" style="object-fit: cover; height: 400px;" />
+                            <img th:unless="${book.image}" src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" class="img-fluid w-100" alt="Default book cover" style="object-fit: cover; height: 400px;" />
+                        </div>
+
+                        <!-- Xếp hạng và Đánh giá -->
+                        <div class="rating mt-3 text-center">
+                            <div class="stars mb-2">
+                                <span th:if="${book.averageRating != null}" th:text="${'Xếp hạng: ' + #numbers.formatDecimal(book.averageRating, 1, 1) + '/5'}">4.5/5</span>
+                                <span th:unless="${book.averageRating != null}">Chưa có đánh giá</span>
                             </div>
-                            <div class="card-body">
-                                <!-- Nội dung chi tiết sách sẽ được hiển thị ở đây -->
-                                <div th:if="${book}" class="book-details">
-                                    <div class="text-center mb-4">
-                                        <img th:if="${book.image}" th:src="${book.image}" width="200" alt="book cover" />
-                                    </div>
-                                    <h3 th:text="${book.title}">Tên sách</h3>
-                                    <p><strong>Tác giả:</strong> <span th:text="${book.author}">Tác giả</span></p>
-                                    <p><strong>Mô tả:</strong> <span th:text="${book.description}">Mô tả sách</span></p>
-                                    <!-- Thêm các thông tin khác của sách nếu cần -->
+                            <div class="d-flex justify-content-center">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star-half-alt text-warning"></i>
+                            </div>
+                            <p class="text-muted mt-2" th:text="${book.reviewCount != null ? book.reviewCount + ' đánh giá' : '0 đánh giá'}">125 đánh giá</p>
+                        </div>
+                    </div>
+
+                    <!-- Thông tin sách -->
+                    <div class="col-md-8">
+                        <div class="card shadow-sm border-0" style="border-radius: 12px;">
+                            <div class="card-body p-4">
+                                <h2 class="card-title mb-3" th:text="${book.title}">Tên sách</h2>
+                                <h5 class="card-subtitle mb-3 text-muted" th:text="${'Tác giả: ' + book.author}">Tác giả</h5>
+                                
+                                <div class="book-meta mb-4">
+                                    <span class="badge main-color text-white me-2" th:text="${book.category}">Thể loại</span>
+                                    <span class="badge bg-secondary me-2" th:text="${book.copiesAvailable + ' bản có sẵn'}">Số lượng</span>
+                                    <span class="badge bg-info text-white" th:if="${book.publisher}" th:text="${book.publisher}">Nhà xuất bản</span>
                                 </div>
                                 
-                                <!-- Thông báo nếu không tìm thấy sách -->
-                                <div th:unless="${book}" class="alert alert-warning">
-                                    Không tìm thấy thông tin sách.
+                                <div class="book-description mb-4">
+                                    <h5>Mô tả</h5>
+                                    <p th:text="${book.description}">Mô tả sách chi tiết ở đây...</p>
                                 </div>
+                                
+                                <!-- Thông tin thêm -->
+                                <div class="additional-info mb-4">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>ISBN:</strong> <span th:text="${book.isbn != null ? book.isbn : 'Không có'}">1234567890</span></p>
+                                            <p><strong>Ngày xuất bản:</strong> <span th:text="${book.publicationDate != null ? book.publicationDate : 'Không có'}">01/01/2023</span></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Ngôn ngữ:</strong> <span th:text="${book.language != null ? book.language : 'Tiếng Việt'}">Tiếng Việt</span></p>
+                                            <p><strong>Số trang:</strong> <span th:text="${book.pageCount != null ? book.pageCount : 'Không có'}">300</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Các nút hành động -->
+                                <div class="book-actions mt-4">
+                                    <!-- Hiển thị nút thuê sách khi đăng nhập -->
+                                    <div sec:authorize="isAuthenticated()" class="d-flex flex-wrap gap-2">
+                                        <button th:if="${book.copiesAvailable > 0}" class="btn main-color text-white" data-bs-toggle="modal" data-bs-target="#rentModal">
+                                            <i class="fas fa-shopping-cart me-2"></i> Thuê sách
+                                        </button>
+                                        <button th:if="${book.copiesAvailable == 0}" class="btn btn-secondary" disabled>
+                                            <i class="fas fa-exclamation-circle me-2"></i> Hết sách
+                                        </button>
+                                        <a href="#reviews" class="btn btn-outline-primary">
+                                            <i class="fas fa-comment me-2"></i> Xem đánh giá
+                                        </a>
+                                        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#shareModal">
+                                            <i class="fas fa-share-alt me-2"></i> Chia sẻ
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Hiển thị nút đăng nhập khi chưa đăng nhập -->
+                                    <div sec:authorize="!isAuthenticated()">
+                                        <a th:href="@{/login}" class="btn main-color text-white">
+                                            <i class="fas fa-sign-in-alt me-2"></i> Đăng nhập để thuê sách
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Đơn hàng hiện tại của sách này -->
+                        <div sec:authorize="isAuthenticated()" class="card shadow-sm border-0 mt-4" style="border-radius: 12px;" th:if="${currentCheckout != null}">
+                            <div class="card-header main-color text-white">
+                                <h5 class="mb-0">Đơn hàng hiện tại của bạn</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="mb-1"><strong>Ngày thuê:</strong> <span th:text="${#dates.format(currentCheckout.checkoutDate, 'dd/MM/yyyy')}">01/01/2023</span></p>
+                                        <p class="mb-1"><strong>Ngày hẹn trả:</strong> <span th:text="${#dates.format(currentCheckout.returnDate, 'dd/MM/yyyy')}">15/01/2023</span></p>
+                                        <p class="mb-0"><strong>Trạng thái:</strong> <span class="badge bg-success">Đang thuê</span></p>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#returnModal">
+                                            <i class="fas fa-undo me-2"></i> Trả sách
+                                        </button>
+                                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#extendModal">
+                                            <i class="fas fa-calendar-plus me-2"></i> Gia hạn
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Lịch sử thuê sách này -->
+                        <div sec:authorize="isAuthenticated()" class="card shadow-sm border-0 mt-4" style="border-radius: 12px;" th:if="${!#lists.isEmpty(checkoutHistory)}">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Lịch sử thuê sách</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Ngày thuê</th>
+                                                <th>Ngày trả</th>
+                                                <th>Trạng thái</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="checkout : ${checkoutHistory}">
+                                                <td th:text="${#dates.format(checkout.checkoutDate, 'dd/MM/yyyy')}">01/01/2023</td>
+                                                <td th:text="${checkout.returnedDate != null ? #dates.format(checkout.returnedDate, 'dd/MM/yyyy') : 'Chưa trả'}">15/01/2023</td>
+                                                <td>
+                                                    <span th:if="${checkout.returned}" class="badge bg-success">Đã trả</span>
+                                                    <span th:unless="${checkout.returned}" class="badge bg-danger">Quá hạn</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Phần đánh giá -->
+                <div id="reviews" class="reviews-section mt-5">
+                    <h3 class="mb-4">Đánh giá từ độc giả</h3>
+                    
+                    <!-- Form đánh giá -->
+                    <div sec:authorize="isAuthenticated()" class="card shadow-sm mb-4" style="border-radius: 12px;">
+                        <div class="card-body">
+                            <h5 class="card-title">Đánh giá của bạn</h5>
+                            <form th:action="@{/books/{id}/review(id=${book.id})}" method="post">
+                                <div class="mb-3">
+                                    <label for="rating" class="form-label">Xếp hạng</label>
+                                    <select class="form-select" id="rating" name="rating" required>
+                                        <option value="5">5 sao - Xuất sắc</option>
+                                        <option value="4">4 sao - Rất tốt</option>
+                                        <option value="3">3 sao - Tốt</option>
+                                        <option value="2">2 sao - Bình thường</option>
+                                        <option value="1">1 sao - Không thích</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="reviewContent" class="form-label">Nội dung đánh giá</label>
+                                    <textarea class="form-control" id="reviewContent" name="content" rows="3" required></textarea>
+                                </div>
+                                <button type="submit" class="btn main-color text-white">Gửi đánh giá</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Danh sách đánh giá -->
+                    <div th:if="${reviews != null && !reviews.empty}">
+                        <div th:each="review : ${reviews}" class="card shadow-sm mb-3" style="border-radius: 12px;">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="card-title mb-0" th:text="${review.email ?: 'Ẩn danh'}">Người dùng</h5>
+                                    <div class="d-flex">
+                                        <span th:each="i : ${#numbers.sequence(1, review.rating)}" class="text-warning me-1">
+                                            <i class="fas fa-star"></i>
+                                        </span>
+                                        <span th:each="i : ${#numbers.sequence(review.rating + 1, 5)}" class="text-secondary me-1">
+                                            <i class="fas fa-star"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <p class="card-text" th:text="${review.headline}">Tiêu đề đánh giá</p>
+                                <p class="card-text" th:text="${review.message}">Nội dung đánh giá</p>
+                                <p class="card-text"><small class="text-muted" th:text="${#dates.format(review.date, 'dd/MM/yyyy')}">01/01/2023</small></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Thông báo khi không có đánh giá -->
+                    <div th:if="${reviews == null || reviews.empty}" class="alert alert-info">
+                        Chưa có đánh giá nào cho sách này. Hãy là người đầu tiên đánh giá!
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal thuê sách -->
+            <div class="modal fade" id="rentModal" tabindex="-1" aria-labelledby="rentModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header main-color text-white">
+                            <h5 class="modal-title" id="rentModalLabel">Thuê sách</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form th:action="@{/books/{id}/checkout(id=${book.id})}" method="post">
+                                <div class="mb-3">
+                                    <label for="rentDuration" class="form-label">Thời gian thuê</label>
+                                    <select class="form-select" id="rentDuration" name="duration" required>
+                                        <option value="7">7 ngày - 35.000đ</option>
+                                        <option value="14">14 ngày - 60.000đ</option>
+                                        <option value="30">30 ngày - 120.000đ</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="paymentMethod" class="form-label">Phương thức thanh toán</label>
+                                    <select class="form-select" id="paymentMethod" name="paymentMethod" required>
+                                        <option value="CASH">Tiền mặt</option>
+                                        <option value="CREDIT_CARD">Thẻ tín dụng</option>
+                                        <option value="BANK_TRANSFER">Chuyển khoản</option>
+                                    </select>
+                                </div>
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Tổng cộng</h6>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Phí thuê:</span>
+                                            <span id="rentFee">35.000đ</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Phí vận chuyển:</span>
+                                            <span>Miễn phí</span>
+                                        </div>
+                                        <hr>
+                                        <div class="d-flex justify-content-between fw-bold">
+                                            <span>Tổng thanh toán:</span>
+                                            <span id="totalAmount">35.000đ</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                    <label class="form-check-label" for="agreeTerms">
+                                        Tôi đồng ý với <a href="#">điều khoản dịch vụ</a> và <a href="#">chính sách thuê sách</a>
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn main-color text-white w-100">Xác nhận thanh toán</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal trả sách -->
+            <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-warning text-dark">
+                            <h5 class="modal-title" id="returnModalLabel">Trả sách</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form th:action="@{/books/{id}/return(id=${book.id})}" method="post">
+                                <p>Bạn có chắc chắn muốn trả sách <strong th:text="${book.title}">Tên sách</strong>?</p>
+                                <div class="mb-3">
+                                    <label for="bookCondition" class="form-label">Tình trạng sách</label>
+                                    <select class="form-select" id="bookCondition" name="condition" required>
+                                        <option value="GOOD">Tốt - Không có hư hại</option>
+                                        <option value="NORMAL">Bình thường - Có vài vết bẩn nhỏ</option>
+                                        <option value="DAMAGED">Hư hại - Có vết rách hoặc hư hỏng</option>
+                                    </select>
+                                </div>
+                                <div id="damageDetails" class="mb-3 d-none">
+                                    <label for="damageDescription" class="form-label">Mô tả hư hỏng</label>
+                                    <textarea class="form-control" id="damageDescription" name="damageDescription" rows="3"></textarea>
+                                </div>
+                                <button type="submit" class="btn bg-warning text-dark w-100">Xác nhận trả sách</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal gia hạn -->
+            <div class="modal fade" id="extendModal" tabindex="-1" aria-labelledby="extendModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="extendModalLabel">Gia hạn thuê sách</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form th:action="@{/books/{id}/extend(id=${book.id})}" method="post">
+                                <div class="mb-3">
+                                    <label for="extendDuration" class="form-label">Thời gian gia hạn</label>
+                                    <select class="form-select" id="extendDuration" name="duration" required>
+                                        <option value="7">7 ngày - 35.000đ</option>
+                                        <option value="14">14 ngày - 60.000đ</option>
+                                        <option value="30">30 ngày - 120.000đ</option>
+                                    </select>
+                                </div>
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Tổng cộng</h6>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Phí gia hạn:</span>
+                                            <span id="extendFee">35.000đ</span>
+                                        </div>
+                                        <hr>
+                                        <div class="d-flex justify-content-between fw-bold">
+                                            <span>Tổng thanh toán:</span>
+                                            <span id="extendTotalAmount">35.000đ</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Xác nhận gia hạn</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal chia sẻ -->
+            <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="shareModalLabel">Chia sẻ sách này</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="shareLink" th:value="${'http://localhost:8080/book/' + book.id}" readonly>
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyShareLink()">Sao chép</button>
+                            </div>
+                            <div class="d-flex justify-content-center gap-3 mt-3">
+                                <a href="#" class="btn btn-primary"><i class="fab fa-facebook"></i> Facebook</a>
+                                <a href="#" class="btn btn-info text-white"><i class="fab fa-twitter"></i> Twitter</a>
+                                <a href="#" class="btn btn-success"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                                <a href="#" class="btn btn-danger"><i class="fas fa-envelope"></i> Email</a>
                             </div>
                         </div>
                     </div>
@@ -38,6 +358,69 @@
             </div>
         </div>
     </div>
+    
+    <!-- Scripts for modals -->
+    <script>
+        // Cập nhật giá khi chọn thời gian thuê
+        document.addEventListener('DOMContentLoaded', function() {
+            const rentDuration = document.getElementById('rentDuration');
+            const rentFee = document.getElementById('rentFee');
+            const totalAmount = document.getElementById('totalAmount');
+            
+            if (rentDuration) {
+                rentDuration.addEventListener('change', function() {
+                    let fee = 0;
+                    switch(this.value) {
+                        case '7': fee = 35000; break;
+                        case '14': fee = 60000; break;
+                        case '30': fee = 120000; break;
+                    }
+                    rentFee.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(fee);
+                    totalAmount.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(fee);
+                });
+            }
+            
+            // Hiển thị trường mô tả hư hỏng khi chọn sách bị hư hại
+            const bookCondition = document.getElementById('bookCondition');
+            const damageDetails = document.getElementById('damageDetails');
+            
+            if (bookCondition && damageDetails) {
+                bookCondition.addEventListener('change', function() {
+                    if (this.value === 'DAMAGED') {
+                        damageDetails.classList.remove('d-none');
+                    } else {
+                        damageDetails.classList.add('d-none');
+                    }
+                });
+            }
+            
+            // Cập nhật phí gia hạn
+            const extendDuration = document.getElementById('extendDuration');
+            const extendFee = document.getElementById('extendFee');
+            const extendTotalAmount = document.getElementById('extendTotalAmount');
+            
+            if (extendDuration) {
+                extendDuration.addEventListener('change', function() {
+                    let fee = 0;
+                    switch(this.value) {
+                        case '7': fee = 35000; break;
+                        case '14': fee = 60000; break;
+                        case '30': fee = 120000; break;
+                    }
+                    extendFee.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(fee);
+                    extendTotalAmount.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(fee);
+                });
+            }
+        });
+        
+        // Sao chép link chia sẻ
+        function copyShareLink() {
+            const shareLink = document.getElementById('shareLink');
+            shareLink.select();
+            document.execCommand('copy');
+            alert('Đã sao chép đường dẫn!');
+        }
+    </script>
 </body>
 
 </html>

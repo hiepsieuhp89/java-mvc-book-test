@@ -39,4 +39,26 @@ public class Book {
 	
 	@Column(name = "image")
 	private String image;
+	
+	@Column(name = "isbn")
+	private String isbn;
+	
+	@Column(name = "publication_date")
+	private String publicationDate;
+	
+	@Column(name = "language")
+	private String language;
+	
+	@Column(name = "page_count")
+	private Integer pageCount;
+	
+	@Column(name = "publisher")
+	private String publisher;
+	
+	// These fields aren't persisted but can be calculated as needed
+	@javax.persistence.Transient
+	private Double averageRating;
+	
+	@javax.persistence.Transient
+	private Integer reviewCount;
 }
