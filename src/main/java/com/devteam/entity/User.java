@@ -4,7 +4,9 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -15,25 +17,32 @@ public class User {
     private Long id;
 
     @NotEmpty(message = "Tên đăng nhập không được để trống")
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String username;
 
     @NotEmpty(message = "Mật khẩu không được để trống")
+    @Column(nullable = false)
     private String password;
 
     @NotEmpty(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")
-    @Column(unique = true)
+    @Column(nullable = false)
     private String email;
 
-    @NotEmpty(message = "Họ không được để trống")
-    private String firstName;
+    @NotEmpty(message = "Họ và tên không được để trống")
+    @Column(name = "full_name", nullable = false)
+    private String fullName;
 
-    @NotEmpty(message = "Tên không được để trống")
-    private String lastName;
-
-    private String role = "USER";
+    @Column(name = "active")
     private boolean active = true;
+    
+    @Column(name = "enabled")
+    private boolean enabled = true;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private Set<String> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Checkout> checkouts = new ArrayList<>();
@@ -42,12 +51,13 @@ public class User {
     public User() {
     }
 
-    public User(String username, String password, String email, String firstName, String lastName) {
+    public User(String username, String password, String email, String fullName) {
         this.username = username;
         this.password = password;
         this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.fullName = fullName;
+        this.active = true;
+        this.enabled = true;
     }
 
     // Getters and Setters
@@ -83,28 +93,12 @@ public class User {
         this.email = email;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public boolean isActive() {
@@ -114,6 +108,16 @@ public class User {
     public void setActive(boolean active) {
         this.active = active;
     }
+    
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        // Đồng bộ giá trị với active
+        this.active = enabled;
+    }
 
     public List<Checkout> getCheckouts() {
         return checkouts;
@@ -121,5 +125,23 @@ public class User {
 
     public void setCheckouts(List<Checkout> checkouts) {
         this.checkouts = checkouts;
+    }
+    
+    public Set<String> getRoles() {
+        return roles;
+    }
+    
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
+    }
+
+    // Method to check if user has a specific role
+    public boolean hasRole(String role) {
+        return roles.contains(role);
+    }
+    
+    // Add a role to user
+    public void addRole(String role) {
+        roles.add(role);
     }
 } 

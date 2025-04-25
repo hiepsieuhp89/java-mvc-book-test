@@ -160,7 +160,9 @@
                             </span>
                         </li>
                         <li class="nav-item" sec:authorize="isAuthenticated()">
-                            <a class="nav-link" href="/logout">Đăng xuất</a>
+                            <form th:action="@{/logout}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-link nav-link">Đăng xuất</button>
+                            </form>
                         </li>
                     </ul>
                 </div>

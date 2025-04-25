@@ -2,35 +2,68 @@ package com.devteam.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.accept.ContentNegotiationStrategy;
-import org.springframework.web.accept.HeaderContentNegotiationStrategy;
-
-import com.okta.spring.boot.oauth.Okta;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfiguration {
 
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+	@Lazy
+	@Autowired
+	private UserDetailsService userDetailsService;
 
-		httpSecurity.csrf().disable();
-		httpSecurity.authorizeRequests(
-				config -> config.antMatchers("/api/books/checkout/**", "/api/reviews/secure/**", "/api/messages/secure/**", "/api/admin/secure/**")
-				.authenticated())
-				.oauth2ResourceServer().jwt();
+	@Bean
+	public static PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+	@Autowired
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(userDetailsService)
+			.passwordEncoder(passwordEncoder());
+	}
+
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		http
+			.csrf(csrf -> csrf.disable())
+			.authorizeRequests(authorize -> authorize
+				.antMatchers("/api/books/secure/**", "/api/reviews/secure/**", "/api/messages/secure/**", "/api/admin/secure/**")
+				.authenticated()
+				.antMatchers("/", "/home", "/search", "/book/**", "/index", "/css/**", "/js/**", "/images/**", 
+							 "/register", "/api/books", "/api/books/**", "/favicon.ico")
+				.permitAll()
+				.antMatchers("/shelf", "/fees").hasAnyRole("USER", "ADMIN")
+				.antMatchers("/admin").hasRole("ADMIN")
+				.anyRequest().authenticated()
+			)
+			.formLogin(form -> form
+				.loginPage("/login")
+				.defaultSuccessUrl("/home", true)
+				.permitAll()
+			)
+			.logout(logout -> logout
+				.permitAll()
+				.logoutSuccessUrl("/login?logout")
+			)
+			.exceptionHandling(ex -> ex
+				.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+			);
 
 		// Add CORS filters
-		httpSecurity.cors();
+		http.cors();
 
-		// Add content negotiation strategy
-		httpSecurity.setSharedObject(ContentNegotiationStrategy.class, new HeaderContentNegotiationStrategy());
-
-		// Force a non-empty response body for 401's to make the response friendly
-		Okta.configureResourceServer401ResponseBody(httpSecurity);
-
-		return httpSecurity.build();
-
+		return http.build();
 	}
 }

@@ -87,11 +87,6 @@ public class ViewController {
         return "book-detail";
     }
     
-    @GetMapping("/login")
-    public String login() {
-        return "login";
-    }
-    
     @GetMapping("/shelf")
     public String shelf(Model model) {
         // This will need authentication
